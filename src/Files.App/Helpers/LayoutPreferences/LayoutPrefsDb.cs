@@ -16,7 +16,7 @@ namespace Files.App.Helpers.LayoutPreferences
 			SafetyExtensions.IgnoreExceptions(() => CheckDbVersion(connection));
 			db = new LiteDatabase(new ConnectionString(connection)
 			{
-				Mode = shared ? LiteDB.FileMode.Shared : LiteDB.FileMode.Exclusive
+				Connection = shared ? ConnectionType.Shared : ConnectionType.Direct
 			}, new BsonMapper() { IncludeFields = true });
 		}
 
@@ -104,11 +104,11 @@ namespace Files.App.Helpers.LayoutPreferences
 			var col = db.GetCollection<LayoutDbPrefs>("layoutprefs");
 			if (predicate is null)
 			{
-				col.Delete(Query.All());
+				col.DeleteAll();
 			}
 			else
 			{
-				col.Delete(x => predicate(x));
+				col.DeleteMany(x => predicate(x));
 			}
 		}
 
@@ -134,7 +134,7 @@ namespace Files.App.Helpers.LayoutPreferences
 		{
 			var dataValues = JsonSerializer.DeserializeArray(json);
 			var col = db.GetCollection("layoutprefs");
-			col.Delete(Query.All());
+			col.DeleteAll();
 			col.InsertBulk(dataValues.Select(x => x.AsDocument));
 		}
 

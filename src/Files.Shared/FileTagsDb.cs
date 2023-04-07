@@ -18,7 +18,7 @@ namespace Common
 			SafetyExtensions.IgnoreExceptions(() => CheckDbVersion(connection));
 			db = new LiteDatabase(new ConnectionString(connection)
 			{
-				Mode = shared ? LiteDB.FileMode.Shared : LiteDB.FileMode.Exclusive
+				Connection = shared ? ConnectionType.Shared : ConnectionType.Direct
 			});
 			UpdateDb();
 		}
@@ -174,7 +174,7 @@ namespace Common
 		{
 			var dataValues = JsonSerializer.DeserializeArray(json);
 			var col = db.GetCollection(TaggedFiles);
-			col.Delete(Query.All());
+			col.DeleteAll();
 			col.InsertBulk(dataValues.Select(x => x.AsDocument));
 		}
 
@@ -185,7 +185,7 @@ namespace Common
 
 		private void UpdateDb()
 		{
-			if (db.Engine.UserVersion == 0)
+			if (db.UserVersion == 0)
 			{
 				var col = db.GetCollection(TaggedFiles);
 				foreach (var doc in col.FindAll())
@@ -194,7 +194,7 @@ namespace Common
 					doc.Remove("Tags");
 					col.Update(doc);
 				}
-				db.Engine.UserVersion = 1;
+				db.UserVersion = 1;
 			}
 		}
 
