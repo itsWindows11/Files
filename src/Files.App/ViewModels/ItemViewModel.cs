@@ -23,6 +23,7 @@ using Files.Shared.EventArguments;
 using Files.Shared.Extensions;
 using Files.Shared.Services;
 using FluentFTP;
+using FluentFTP.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
